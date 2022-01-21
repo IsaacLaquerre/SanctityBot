@@ -10,9 +10,10 @@ module.exports.run = (client, message, args) => {
     });
 };
 
-module.exports.help = {
+module.exports.info = {
     name: "ping",
     aliases: null,
     description: "Check the bot's ping",
-    usage: "ping"
+    usage: "ping",
+    restricted: false
 };
