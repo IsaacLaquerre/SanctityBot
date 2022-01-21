@@ -1,4 +1,4 @@
 {
-  "token": "BOT_TOKEN_HERE",
-  "prefix": "."
+    "token": "BOT_TOKEN_HERE",
+    "prefix": "."
 }
