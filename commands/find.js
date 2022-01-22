@@ -3,8 +3,8 @@ const config = require("../botConfig.json");
 const utils = require("../utils.js");
 
 module.exports.run = (client, message, args) => {
-    if (!args[1]) return;
     utils.checkPermission(client, message, this.info.restricted).then(allowed => {
+        if (!args[1]) return utils.messages.noArgs(message.channel, "user");
         if (allowed) {
             client.guilds.fetch(config.guildId).then(guild => {
                 guild.members.search({ query: args[1], limit: 1 }).then(member => {
@@ -20,7 +20,7 @@ module.exports.run = (client, message, args) => {
                     message.channel.send({ embeds: [embed] });
                 });
             });
-        } else return utils.missingPermissions(message.channel);
+        } else return utils.messages.missingPermissions(message.channel);
     }).catch(err => {
         console.log(err);
     });

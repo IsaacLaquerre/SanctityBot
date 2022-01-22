@@ -24,41 +24,44 @@ module.exports.run = (client, message, args) => {
         var moderatorRole;
         client.guilds.fetch(config.guildId).then(guild => {
             ballerRole = guild.roles.cache.find(role => role.name === "baller");
+            organizerRole = guild.roles.cache.find(role => role.name === "Organizer");
+            securityRole = guild.roles.cache.find(role => role.name === "Security");
+            moderatorRole = guild.roles.cache.find(role => role.name === "Moderator");
+
+            for ([k, v] of client.commands.entries()) {
+                if (!v.info.restricted) {
+                    unrestricedCommands.push(config.prefix + v.info.name);
+                    break;
+                }
+                switch (v.info.restricted.toLowerCase()) {
+                    case "organizer":
+                        organizerCommands.push(config.prefix + v.info.name);
+                        break;
+                    case "security":
+                        securityCommands.push(config.prefix + v.info.name);
+                        break;
+                    case "moderator":
+                        moderatorCommands.push(config.prefix + v.info.name);
+                        break;
+                    default:
+                        break;
+                }
+            }
+
+            var embed = new Discord.MessageEmbed()
+                .setTitle("List of commands")
+                .setColor("#FFFFFF")
+                .setDescription("Use " + config.prefix + "help <command> for more info on a specific command")
+                .addField("Required role", ballerRole.toString())
+                .addField("`" + unrestricedCommands.join("`, `") + "`", "\u200b")
+                .addField("Required role", organizerRole.toString())
+                .addField("`" + organizerCommands.join("`, `") + "`", "\u200b")
+                .addField("Required role", securityRole.toString())
+                .addField("`" + securityCommands.join("`, `") + "`", "\u200b")
+                .addField("Required role", moderatorRole.toString())
+                .addField("`" + moderatorCommands.join("`, `") + "`", "\u200b");
+            message.channel.send({ embeds: [embed] });
         });
-
-        for ([k, v] of client.commands.entries()) {
-            if (!v.info.restricted) {
-                unrestricedCommands.push(config.prefix + v.info.name);
-                break;
-            }
-            switch (v.info.restricted.toLowerCase()) {
-                case "organizer":
-                    organizerCommands.push(config.prefix + v.info.name);
-                    break;
-                case "security":
-                    securityCommands.push(config.prefix + v.info.name);
-                    break;
-                case "moderator":
-                    moderatorCommands.push(config.prefix + v.info.name);
-                    break;
-                default:
-                    break;
-            }
-        }
-
-        var embed = new Discord.MessageEmbed()
-            .setTitle("List of commands")
-            .setColor("#FFFFFF")
-            .setDescription("Use " + config.prefix + "help <command> for more info on a specific command")
-            .addField("Required role", "baller")
-            .addField("`" + unrestricedCommands.join("`, `") + "`", "\u200b")
-            .addField("Required role", "Organizer")
-            .addField("`" + organizerCommands.join("`, `") + "`", "\u200b")
-            .addField("Required role", "Security")
-            .addField("`" + securityCommands.join("`, `") + "`", "\u200b")
-            .addField("Required role", "Moderator")
-            .addField("`" + moderatorCommands.join("`, `") + "`", "\u200b");
-        message.channel.send({ embeds: [embed] });
     }
 };
 

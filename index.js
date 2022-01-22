@@ -39,7 +39,7 @@ for (const file of commandFiles) {
 
 client.on("messageCreate", (message) => {
     if (message.channel.type == "dm" || message.author.bot || message.author.id === config.botId) return;
-    if (message.mentions.has(client.users.fetch(config.botId))) return message.channel.send("My prefix is `" + PREFIX + "`");
+    if (message.mentions.has(config.botId)) return message.channel.send("My prefix is `" + PREFIX + "`");
     if (!message.content.startsWith(PREFIX)) return;
     var args = message.content.slice(PREFIX.length).split(" ");
 

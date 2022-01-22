@@ -11,11 +11,25 @@ module.exports = {
                 else resolve(true);
             });
         });
-    },
+    }
+}
 
+module.exports.messages = {
     missingPermissions(channel) {
         var embed = new Discord.MessageEmbed()
             .setDescription("You do not have the required permissions to use that command.");
+        channel.send({ embeds: [embed] });
+    },
+
+    unknownUser(channel) {
+        var embed = new Discord.MessageEmbed()
+            .setDescription("Couldn't find that user.");
+        channel.send({ embeds: [embed] });
+    },
+
+    noArgs(channel, arg) {
+        var embed = new Discord.MessageEmbed()
+            .setDescription("Command is missing a parameter: `" + arg + "`.");
         channel.send({ embeds: [embed] });
     }
 };
