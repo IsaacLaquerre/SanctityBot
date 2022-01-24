@@ -30,7 +30,7 @@ module.exports.run = (client, message, args) => {
 module.exports.info = {
     name: "find",
     aliases: ["f"],
-    description: "Shows information regarder a user",
+    description: "Shows information regarding a user",
     usage: "find <name/ID/nickname>",
     restricted: "Organizer"
 };
