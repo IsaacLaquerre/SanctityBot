@@ -30,28 +30,28 @@ module.exports.run = (client, message, args) => {
 
             for ([k, v] of client.commands.entries()) {
                 if (!v.info.restricted) {
-                    unrestricedCommands.push(config.prefix + v.info.name);
-                    break;
-                }
-                switch (v.info.restricted.toLowerCase()) {
-                    case "organizer":
-                        organizerCommands.push(config.prefix + v.info.name);
-                        break;
-                    case "security":
-                        securityCommands.push(config.prefix + v.info.name);
-                        break;
-                    case "moderator":
-                        moderatorCommands.push(config.prefix + v.info.name);
-                        break;
-                    default:
-                        break;
+                    if (v.info.name != "help") unrestricedCommands.push(config.prefix + v.info.name);
+                } else {
+                    switch (v.info.restricted.toLowerCase()) {
+                        case "organizer":
+                            organizerCommands.push(config.prefix + v.info.name);
+                            break;
+                        case "security":
+                            securityCommands.push(config.prefix + v.info.name);
+                            break;
+                        case "moderator":
+                            moderatorCommands.push(config.prefix + v.info.name);
+                            break;
+                        default:
+                            break;
+                    }
                 }
             }
 
             var embed = new Discord.MessageEmbed()
                 .setTitle("List of commands")
                 .setColor("#FFFFFF")
-                .setDescription("Use " + config.prefix + "help <command> for more info on a specific command")
+                .setDescription("Use `" + config.prefix + "help <command>` for more info on a specific command")
                 .addField("Required role", ballerRole.toString())
                 .addField("`" + unrestricedCommands.join("`, `") + "`", "\u200b")
                 .addField("Required role", organizerRole.toString())

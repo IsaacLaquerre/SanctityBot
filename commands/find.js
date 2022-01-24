@@ -9,14 +9,15 @@ module.exports.run = (client, message, args) => {
             client.guilds.fetch(config.guildId).then(guild => {
                 guild.members.search({ query: args[1], limit: 1 }).then(member => {
                     member = member.first();
+                    if (!member) return utils.messages.unknownUser(message.channel);
                     var embed = new Discord.MessageEmbed()
                         .setTitle(member.user.username)
                         .setDescription(member.toString())
                         .setThumbnail(member.user.avatarURL())
                         .addField("ID", member.user.id, true)
-                        .addField("Realmeye Link", (message.author.nickname != null ? "https://www.realmeye.com/" + message.author.nickname : "Unknown"), true)
+                        .addField("Realmeye Link", (member.nickname != null ? "https://www.realmeye.com/player/" + member.nickname : "Unknown"), true)
                         .addField("Highest role", member.roles.highest.toString(), true)
-                        .setFooter("Requested by: " + (message.author.nickname != null ? message.author.nickname : message.author.username));
+                        .setFooter("Requested by: " + (message.member.nickname != null ? message.member.nickname : message.author.username));
                     message.channel.send({ embeds: [embed] });
                 });
             });
@@ -30,6 +31,6 @@ module.exports.info = {
     name: "find",
     aliases: ["f"],
     description: "Shows information regarder a user",
-    usage: "find <name/ID.nickname>",
+    usage: "find <name/ID/nickname>",
     restricted: "Organizer"
 };

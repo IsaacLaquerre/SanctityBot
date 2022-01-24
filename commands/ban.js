@@ -13,16 +13,16 @@ module.exports.run = (client, message, args) => {
             var reason = args.slice(2).join(" ");
             var embed = new Discord.MessageEmbed()
                 .setAuthor(member.user.tag, member.user.avatarURL())
-                .setTitle("Kicked by " + (message.member.nickname != null ? message.member.nickname : message.author.tag))
+                .setTitle("Banned by " + (message.member.nickname != null ? message.member.nickname : message.author.tag))
                 .setDescription("Reason: `" + reason + "`")
                 .setColor("#FF0000")
                 .setFooter("ID: " + member.user.id);
             utils.log(client, embed, true);
             embed = new Discord.MessageEmbed()
-                .setDescription("Kicked " + member.user.tag.toString())
+                .setDescription("Banned " + member.user.tag.toString())
                 .setColor("#39FF14");
             message.channel.send({ embeds: [embed] });
-            member.kick(reason);
+            member.ban({ reason: reason });
         } else utils.messages.missingPermissions(message.channel);
     }).catch(err => {
         console.log(err);
@@ -30,9 +30,9 @@ module.exports.run = (client, message, args) => {
 };
 
 module.exports.info = {
-    name: "kick",
+    name: "ban",
     aliases: null,
-    description: "Kicks a user with a given reason",
-    usage: "kick <name/ID/nickname> <reason>",
-    restricted: "Security"
+    description: "Bans a user with a given reason",
+    usage: "ban <name/ID/nickname> <reason>",
+    restricted: "Moderator"
 };
