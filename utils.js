@@ -2,12 +2,12 @@ const Discord = require("discord.js");
 const config = require("./botConfig.json");
 
 module.exports = {
-    checkPermission(client, message, roleName) {
+    checkPermission(client, interaction, roleName) {
         return new Promise((resolve, reject) => {
             client.guilds.fetch(config.guildId).then(guild => {
                 var role = guild.roles.cache.find(role => role.name === roleName);
                 if (role === undefined) reject(new Error("Couldn't find a role with the name \"" + roleName + "\""));
-                if (message.member.roles.highest.comparePositionTo(role) < 0) resolve(false);
+                if (interaction.member.roles.highest.comparePositionTo(role) < 0) resolve(false);
                 else resolve(true);
             });
         });
@@ -24,28 +24,52 @@ module.exports = {
 }
 
 module.exports.messages = {
-    missingPermissions(channel) {
+    missingPermissions(interaction) {
         var embed = new Discord.MessageEmbed()
             .setDescription("You do not have the required permissions to use that command.");
-        channel.send({ embeds: [embed] });
+        interaction.reply({ embeds: [embed], ephemeral: true });
     },
 
-    unknownUser(channel) {
+    unknownCommand(interaction, command) {
         var embed = new Discord.MessageEmbed()
-            .setDescription("Couldn't find that user.");
-        channel.send({ embeds: [embed] });
+            .setDescription("Unknown command \"" + command + "\".");
+        interaction.reply({ embeds: [embed], ephemeral: true });
     },
 
-    noArgs(channel, arg) {
+    unknownUser(interaction, user) {
+        var embed = new Discord.MessageEmbed()
+            .setDescription("Couldn't find user \"" + user + "\".");
+        interaction.reply({ embeds: [embed], ephemeral: true });
+    },
+
+    unknownRole(interaction, role) {
+        var embed = new Discord.MessageEmbed()
+            .setDescription("Couldn't find role \"" + role + "\".");
+        interaction.reply({ embeds: [embed], ephemeral: true });
+    },
+
+    noArgs(interaction, arg) {
         var embed = new Discord.MessageEmbed()
             .setDescription("Command is missing a parameter: `" + arg + "`.");
-        channel.send({ embeds: [embed] });
+        interaction.reply({ embeds: [embed], ephemeral: true });
     },
 
-    badArgument(channel, arg, value) {
+    badArgument(interaction, arg, value) {
         var embed = new Discord.MessageEmbed()
             .setDescription("Incorrect argument. Cannot use \"" + value + "\" for parameter `" + arg + "`.");
-        channel.send({ embeds: [embed] });
+        interaction.reply({ embeds: [embed], ephemeral: true });
+    },
+
+    alreadyHasRole(interaction, user, role) {
+        var embed = new Discord.MessageEmbed()
+            .setDescription("User \"" + user + "\" already has the role \"" + role.toString() + "\".");
+        interaction.reply({ embeds: [embed], ephemeral: true });
+    },
+
+    doesntHaveRole(interaction, user, role) {
+        var embed = new Discord.MessageEmbed()
+            .setDescription("User \"" + user + "\" doesn't have the role \"" + role.toString() + "\".");
+        interaction.reply({ embeds: [embed], ephemeral: true });
     }
 };
 
@@ -86,6 +110,7 @@ module.exports.emotes = {
     qot: "<:qots:926221843269029898>",
     fungalTome: "<:fungaltomes:899239154083332156>",
     planewalker: "<:planewalkers:899194100761362512>",
+    brain: "<:brains:899239133250211891>"
 };
 
 Object.defineProperty(String.prototype, 'capitalize', {

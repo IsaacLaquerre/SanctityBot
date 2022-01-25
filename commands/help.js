@@ -1,9 +1,12 @@
 const Discord = require("discord.js");
 const config = require("../botConfig.json");
+const utils = require("../utils.js");
 
-module.exports.run = (client, message, args) => {
-    if (args[1]) {
-        var command = client.commands.find(c => c.info.name === args[1].toLowerCase()) || client.commands.find(c => c.info.aliases.includes(args[1].toLowerCase()));
+module.exports.run = (client, interaction) => {
+    if (interaction.options.get("command")) {
+        try {
+            var command = client.commands.find(c => c.info.name === interaction.options.get("command").value.toLowerCase()) || client.commands.find(c => c.info.aliases.includes(interaction.options.get("command").value.toLowerCase()));
+        } catch (err) { utils.messages.unknownCommand(interaction, interaction.options.get("command").value); }
         if (command) {
             var embed = new Discord.MessageEmbed()
                 .setTitle(command.info.name.capitalize())
@@ -11,7 +14,7 @@ module.exports.run = (client, message, args) => {
                 .setDescription(command.info.description);
             command.info.aliases != null ? embed.addField("Aliases", command.info.aliases.join(", ")) : "";
             embed.addField("Usage", config.prefix + command.info.usage);
-            message.channel.send({ embeds: [embed] });
+            interaction.reply({ embeds: [embed] });
         }
     } else {
         var unrestricedCommands = [];
@@ -23,7 +26,7 @@ module.exports.run = (client, message, args) => {
         var securityRole;
         var moderatorRole;
         client.guilds.fetch(config.guildId).then(guild => {
-            ballerRole = guild.roles.cache.find(role => role.name === "baller");
+            everyoneRole = guild.roles.cache.find(role => role.name === "baller");
             organizerRole = guild.roles.cache.find(role => role.name === "Organizer");
             securityRole = guild.roles.cache.find(role => role.name === "Security");
             moderatorRole = guild.roles.cache.find(role => role.name === "Moderator");
@@ -52,7 +55,7 @@ module.exports.run = (client, message, args) => {
                 .setTitle("List of commands")
                 .setColor("#FFFFFF")
                 .setDescription("Use `" + config.prefix + "help <command>` for more info on a specific command")
-                .addField("Required role", ballerRole.toString())
+                .addField("Required role", "@everyone")
                 .addField("`" + unrestricedCommands.join("`, `") + "`", "\u200b")
                 .addField("Required role", organizerRole.toString())
                 .addField("`" + organizerCommands.join("`, `") + "`", "\u200b")
@@ -60,7 +63,7 @@ module.exports.run = (client, message, args) => {
                 .addField("`" + securityCommands.join("`, `") + "`", "\u200b")
                 .addField("Required role", moderatorRole.toString())
                 .addField("`" + moderatorCommands.join("`, `") + "`", "\u200b");
-            message.channel.send({ embeds: [embed] });
+            interaction.reply({ embeds: [embed] });
         });
     }
 };
@@ -69,6 +72,11 @@ module.exports.info = {
     name: "help",
     aliases: ["h"],
     description: "List of available commands",
+    options: [{
+        name: "command",
+        description: "The optional command you want info on",
+        type: 3
+    }],
     usage: "help [command]",
     restricted: false
 };

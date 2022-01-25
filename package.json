@@ -1,25 +1,30 @@
 {
-  "name": "sanctitybot",
-  "version": "1.0.0",
-  "description": "ROTMG bot to start runs and manage raiders",
-  "main": "index.js",
-  "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
-  },
-  "repository": {
-    "type": "git",
-    "url": "git+https://github.com/IsaacLaquerre/SanctityBot.git"
-  },
-  "keywords": [],
-  "author": "",
-  "license": "ISC",
-  "bugs": {
-    "url": "https://github.com/IsaacLaquerre/SanctityBot/issues"
-  },
-  "homepage": "https://github.com/IsaacLaquerre/SanctityBot#readme",
-  "dependencies": {
-    "clear-console": "^1.1.0",
-    "discord.js": "^13.6.0",
-    "fs": "0.0.1-security"
-  }
+    "name": "sanctitybot",
+    "version": "1.0.0",
+    "description": "ROTMG bot to start runs and manage raiders",
+    "main": "index.js",
+    "scripts": {
+        "test": "echo \"Error: no test specified\" && exit 1"
+    },
+    "repository": {
+        "type": "git",
+        "url": "git+https://github.com/IsaacLaquerre/SanctityBot.git"
+    },
+    "keywords": [],
+    "author": "",
+    "license": "ISC",
+    "bugs": {
+        "url": "https://github.com/IsaacLaquerre/SanctityBot/issues"
+    },
+    "homepage": "https://github.com/IsaacLaquerre/SanctityBot#readme",
+    "dependencies": {
+        "@discordjs/rest": "^0.3.0",
+        "cheerio": "^1.0.0-rc.10",
+        "clear-console": "^1.1.0",
+        "discord-api-types": "^0.26.1",
+        "discord.js": "^13.6.0",
+        "fetch": "^1.1.0",
+        "fs": "0.0.1-security",
+        "mysql": "^2.18.1"
+    }
 }

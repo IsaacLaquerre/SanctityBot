@@ -1,12 +1,12 @@
 const Discord = require("discord.js");
 
-module.exports.run = (client, message, args) => {
-    message.channel.send("**Pinging...**").then(m => {
-        let ping = m.createdTimestamp - message.createdTimestamp;
+module.exports.run = (client, interaction) => {
+    interaction.reply({ content: "**Pinging...**", fetchReply: true }).then(m => {
+        let ping = m.createdTimestamp - interaction.createdTimestamp;
         embed = new Discord.MessageEmbed()
             .setColor("#FFFFFF")
             .setDescription("💓`" + ping + "`ms\n⏱`" + Math.round(client.ws.ping) + "`ms.");
-        m.edit({ embeds: [embed] });
+        interaction.editReply({ embeds: [embed] });
     });
 };
 
