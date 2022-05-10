@@ -1,0 +1,22 @@
+✅ check for user in vc and organizer role
+✅ if not voice channel reply please join one
+✅ start afkcheck with pre-reacts
+✅ wait until rl is ready (embed with openchannel react & endafk react)
+
+✅ create seperate "active runs" module with endrun react
+
+✅ join command (look in runs table) -> join back vc
+
+✅ runs table -> location, runes (object, userId & ign & runeName), keys (object, userId & ign & keyType), playerList (object, userId & ign), rushers (same), clearers (same)
+
+☐ early loc -> only first react gets it (except nitro)
+✅ nitro: every dung
+✅ key: every dung
+✅ vial: halls
+☐ armour break : halls, nest
+☐ qot: nests
+☐ rusher: cult
+
+✅ once endrun -> rename channel, reset permissions and kick everyone from vc
+
+☐ (/log cult) log command for rl (raidLeaders table) -> user, userId, ign, voids, cults, fullskips, o3s, shatters, nests, fungals

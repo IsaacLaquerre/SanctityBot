@@ -20,8 +20,27 @@ module.exports = {
                 else log.send({ embeds: [message] });
             });
         });
+    },
+
+    generateId(length) {
+        var chars = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ1234567890";
+        var result = "";
+
+        for (var i = 0; i < length; i++) result += chars[Math.floor(Math.random() * chars.length)];
+
+        return result;
+    },
+
+    addReaction(reaction, message) {
+        return new Promise((resolve, reject) => {
+            message.react(reaction).then(() => resolve());
+        });
+    },
+
+    disconnectMembers(vc) {
+        vc.members.forEach(member => member.voice.disconnect());
     }
-}
+};
 
 module.exports.messages = {
     missingPermissions(interaction) {
@@ -70,10 +89,17 @@ module.exports.messages = {
         var embed = new Discord.MessageEmbed()
             .setDescription("User \"" + user + "\" doesn't have the role \"" + role.toString() + "\".");
         interaction.reply({ embeds: [embed], ephemeral: true });
+    },
+
+    noVoiceChannel(interaction) {
+        var embed = new Discord.MessageEmbed()
+            .setDescription("Please join a voice channel first.");
+        interaction.reply({ embeds: [embed], ephemeral: true });
     }
 };
 
 module.exports.emotes = {
+    nitro: "<:nitro:935976133017612288>",
     o3: "<:oryxs:924661866192580628>",
     inc: "<:incs:924661470766194709>",
     helmetRune: "<:helms:924660982582759445>",
@@ -91,7 +117,7 @@ module.exports.emotes = {
     nestKey: "<:nestkeys:926220701793386506>",
     fungal: "<:fungalportals:926224937398714408>",
     fungalKey: "<:fungalkeys:926224956675731527>",
-    armourBreak: "<:armour_breaks:899194132357062697>",
+    armorBreak: "<:armor_breaks:899194132357062697>",
     slow: "<:slows:924664614334128139>",
     curse: "<:curses:926213837248684073>",
     expose: "<:exposes:926213854625660988>",
@@ -110,7 +136,11 @@ module.exports.emotes = {
     qot: "<:qots:926221843269029898>",
     fungalTome: "<:fungaltomes:899239154083332156>",
     planewalker: "<:planewalkers:899194100761362512>",
-    brain: "<:brains:899239133250211891>"
+    brain: "<:brains:899239133250211891>",
+    openVc: "🔓",
+    endAfk: "🔚",
+    abortAfk: "❌",
+    endRun: "☑️"
 };
 
 Object.defineProperty(String.prototype, 'capitalize', {

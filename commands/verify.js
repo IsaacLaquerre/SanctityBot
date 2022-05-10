@@ -1,7 +1,9 @@
 const Discord = require("discord.js");
+const config = require("../botConfig.json");
 const reqs = require("../verificationReqs.json");
 
 module.exports.run = (client, interaction, connection) => {
+    if (interaction.channel.id != config.verificationChannel) return
     connection.query("SELECT * FROM users WHERE userId=\"" + interaction.user.id + "\"", function(err, result) {
         if (result[0] === undefined) {
             var code = interaction.guild.name.substring(0, 3) + (Math.floor(Math.random() * (999 - 100 + 1)) + 100);

@@ -11,7 +11,7 @@ const dbConfig = require("./dbConfig.json");
 const reqs = require("./verificationReqs.json");
 
 
-var client = new Discord.Client({ intents: [Discord.Intents.FLAGS.GUILDS, Discord.Intents.FLAGS.GUILD_MEMBERS, Discord.Intents.FLAGS.GUILD_BANS, Discord.Intents.FLAGS.GUILD_EMOJIS_AND_STICKERS, Discord.Intents.FLAGS.GUILD_INTEGRATIONS, Discord.Intents.FLAGS.GUILD_WEBHOOKS, Discord.Intents.FLAGS.GUILD_INVITES, Discord.Intents.FLAGS.GUILD_PRESENCES, Discord.Intents.FLAGS.GUILD_MESSAGES, Discord.Intents.FLAGS.GUILD_MESSAGE_REACTIONS, Discord.Intents.FLAGS.DIRECT_MESSAGES, Discord.Intents.FLAGS.DIRECT_MESSAGE_REACTIONS], partials: ["CHANNEL"] });
+var client = new Discord.Client({ intents: [Discord.Intents.FLAGS.GUILDS, Discord.Intents.FLAGS.GUILD_MEMBERS, Discord.Intents.FLAGS.GUILD_BANS, Discord.Intents.FLAGS.GUILD_EMOJIS_AND_STICKERS, Discord.Intents.FLAGS.GUILD_INTEGRATIONS, Discord.Intents.FLAGS.GUILD_WEBHOOKS, Discord.Intents.FLAGS.GUILD_INVITES, Discord.Intents.FLAGS.GUILD_PRESENCES, Discord.Intents.FLAGS.GUILD_VOICE_STATES, Discord.Intents.FLAGS.GUILD_MESSAGES, Discord.Intents.FLAGS.GUILD_MESSAGE_REACTIONS, Discord.Intents.FLAGS.DIRECT_MESSAGES, Discord.Intents.FLAGS.DIRECT_MESSAGE_REACTIONS], partials: ["CHANNEL"] });
 var connection = mysql.createPool({
     host: dbConfig.host,
     user: dbConfig.user,
@@ -48,7 +48,9 @@ for (const file of commandFiles) {
         name: command.info.name,
         description: command.info.description
     };
-    if (command.info.options) applicationCommand.options = command.info.options;
+    if (command.info.options) {
+        applicationCommand.options = command.info.options;
+    }
     applicationCommands.push(applicationCommand);
 
     if (command.info.aliases != null) {
@@ -57,7 +59,9 @@ for (const file of commandFiles) {
                 name: command.info.aliases[i],
                 description: command.info.description
             };
-            if (command.info.options) applicationCommand.options = command.info.options;
+            if (command.info.options) {
+                applicationCommand.options = command.info.options;
+            }
             applicationCommands.push(applicationCommand);
         }
         console.log("Loaded " + command.info.name + " command");
@@ -134,6 +138,8 @@ client.on("messageCreate", (message) => {
                                     if (($("td")[21] != undefined ? $("td")[21].children[0].data : $("td")[17]) === "hidden") privateLoc = true;
                                     if (!reqs.privateLocation) privateLoc = true;
 
+                                    var ign = $("span.entity-name").text();
+
                                     embed = new Discord.MessageEmbed();
 
                                     if (hasCode && hasStars && privateLoc) {
@@ -145,10 +151,18 @@ client.on("messageCreate", (message) => {
                                                     .setDescription("Verification error:\n\nInternal error, please try again in a few minutes");
                                                 message.author.send({ embeds: [embed] });
                                             } else {
-                                                embed.setTitle("Success!")
-                                                    .setColor("#00FF00")
-                                                    .setDescription("Successfully verified under IGN `[" + message.content + "]`");
-                                                message.author.send({ embeds: [embed] });
+
+                                                client.guilds.fetch(config.guildId).then(guild => {
+                                                    guild.members.fetch(message.author.id).then(member => {
+                                                        member.roles.add(guild.roles.cache.find(r => r.id === config.verifiedRoleId));
+                                                        member.setNickname(ign);
+
+                                                        embed.setTitle("Success!")
+                                                            .setColor("#00FF00")
+                                                            .setDescription("Successfully verified under IGN `[" + ign + "]`");
+                                                        message.author.send({ embeds: [embed] });
+                                                    });
+                                                });
                                             }
                                         });
                                     } else {
@@ -169,16 +183,28 @@ client.on("messageCreate", (message) => {
     }
 });
 
+var dbCommands = ["verify", "find", "f", "join", "j", "afkcheck", "afk", "ac"];
+
 client.on("interactionCreate", async interaction => {
     if (!interaction.isCommand()) return;
 
     var commandFile = client.commands.get(interaction.commandName.toLowerCase());
-    if (commandFile) {
-        if (interaction.commandName.toLowerCase() === "verify" || interaction.commandName.toLowerCase() === "find" || interaction.commandName.toLowerCase() === "f") commandFile.run(client, interaction, connection);
-        else commandFile.run(client, interaction);
+    if (dbCommands.includes(interaction.commandName.toLowerCase())) {
+        if (commandFile) {
+            commandFile.run(client, interaction, connection);
+        } else {
+            for ([k, v] of client.commands.entries()) {
+                if (v.info.aliases != null && v.info.aliases.includes(interaction.commandName.toLowerCase())) v.run(client, interaction, connection);
+            }
+        }
     } else {
-        for ([k, v] of client.commands.entries()) {
-            if (v.info.aliases != null && v.info.aliases.includes(interaction.commandName.toLowerCase())) v.run(client, interaction);
+        if (commandFile) {
+            if (dbCommands.includes(interaction.commandName.toLowerCase())) commandFile.run(client, interaction, connection);
+            else commandFile.run(client, interaction);
+        } else {
+            for ([k, v] of client.commands.entries()) {
+                if (v.info.aliases != null && v.info.aliases.includes(interaction.commandName.toLowerCase())) v.run(client, interaction);
+            }
         }
     }
 });
