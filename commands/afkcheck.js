@@ -1,4 +1,5 @@
 const Discord = require("discord.js");
+const { v4: uuid } = require('uuid');
 const config = require("../botConfig.json");
 const utils = require("../utils.js");
 
@@ -94,7 +95,7 @@ module.exports.run = async(client, interaction, connection) => {
                 embed.setTimestamp(Date.now());
                 if (reacts.length != 0) {
 
-                    var runId = utils.generateId(8);
+                    var runId = uuid();
                     connection.query("SELECT ign FROM users WHERE userId=\"" + interaction.user.id + "\";", async function(err, result) {
                         if (err || result[0] === undefined) {
                             embed = new Discord.MessageEmbed()
@@ -123,6 +124,7 @@ module.exports.run = async(client, interaction, connection) => {
                                     .setThumbnail(embed.thumbnail.url)
                                     .addField("Type", runType, true)
                                     .addField("Location", interaction.options.get("location").value, true)
+                                    .addField("UUID", runId)
                                     .setTimestamp();
 
                                 client.channels.cache.find(c => c.id === config.activeRuns).send({ embeds: [controlEmbed] }).then(control => {
@@ -135,10 +137,10 @@ module.exports.run = async(client, interaction, connection) => {
                                                     var ended = false;
                                                     var aborted = false;
 
-                                                    channel.send({ content: "@ here", embeds: [embed] }).then(async headcount => {
+                                                    channel.send({ content: "@ here", embeds: [embed] }).then(async afkcheck => {
 
                                                         for (i in reacts) {
-                                                            utils.addReaction(reacts[i], headcount);
+                                                            utils.addReaction(reacts[i], afkcheck);
                                                         }
 
                                                         var openVcFilter = (reaction, user) => user.id != client.user.id;
@@ -156,13 +158,13 @@ module.exports.run = async(client, interaction, connection) => {
                                                         var endAfk = control.createReactionCollector({ endAfkFilter });
                                                         var endRun = control.createReactionCollector({ endRunFilter });
                                                         var abortAfk = control.createReactionCollector({ abortAfkFilter });
-                                                        var portal = headcount.createReactionCollector({ portalFilter });
-                                                        var key = headcount.createReactionCollector({ keyFilter });
-                                                        var nitro = headcount.createReactionCollector({ nitroFilter });
-                                                        var vial = headcount.createReactionCollector({ vialFilter });
-                                                        var armorBreak = headcount.createReactionCollector({ armorBreakFilter });
-                                                        var qot = headcount.createReactionCollector({ qotFilter });
-                                                        var rusher = headcount.createReactionCollector({ rusherFilter });
+                                                        var portal = afkcheck.createReactionCollector({ portalFilter });
+                                                        var key = afkcheck.createReactionCollector({ keyFilter });
+                                                        var nitro = afkcheck.createReactionCollector({ nitroFilter });
+                                                        var vial = afkcheck.createReactionCollector({ vialFilter });
+                                                        var armorBreak = afkcheck.createReactionCollector({ armorBreakFilter });
+                                                        var qot = afkcheck.createReactionCollector({ qotFilter });
+                                                        var rusher = afkcheck.createReactionCollector({ rusherFilter });
 
                                                         var countdownMessage;
 
@@ -171,7 +173,7 @@ module.exports.run = async(client, interaction, connection) => {
                                                             if (user.id === config.botId) return;
                                                             if (emoji._emoji.name != utils.emotes.openVc) return;
                                                             var i = 0;
-                                                            headcount.reply("**Voice channel will open in 5...**").then(countdown => {
+                                                            afkcheck.reply("**Voice channel will open in 5...**").then(countdown => {
                                                                 countdownMessage = countdown;
                                                                 var countdownInterval = setInterval(function() {
                                                                     i++;
@@ -193,9 +195,9 @@ module.exports.run = async(client, interaction, connection) => {
                                                                 voiceChannel.permissionOverwrites.create(interaction.guild.roles.cache.find(r => r.id === config.verifiedRoleId), { "CONNECT": false, "VIEW_CHANNEL": true });
                                                                 control.embeds[0].setFooter({ text: "AFK check has ended" });
                                                                 control.edit({ embeds: [control.embeds[0]] });
-                                                                headcount.embeds[0].setFooter({ text: "AFK check has ended" });
-                                                                headcount.embeds[0].setDescription("AFK check was ended by " + user.toString() + ".\nJoin lounge then use the command `" + config.prefix + "join` if you were moved out to be moved back in.");
-                                                                headcount.edit({ embeds: [headcount.embeds[0]] });
+                                                                afkcheck.embeds[0].setFooter({ text: "AFK check has ended" });
+                                                                afkcheck.embeds[0].setDescription("AFK check was ended by " + user.toString() + ".\nJoin lounge then use the command `" + config.prefix + "join` if you were moved out to be moved back in.");
+                                                                afkcheck.edit({ embeds: [afkcheck.embeds[0]] });
                                                                 if (countdownMessage) countdownMessage.delete().catch(err => {});
                                                                 ended = true;
                                                             });
@@ -217,9 +219,9 @@ module.exports.run = async(client, interaction, connection) => {
                                                                     if (runs[0] === undefined) return;
                                                                     control.embeds[0].setFooter({ text: "Run has ended" });
                                                                     control.edit({ embeds: [control.embeds[0]] });
-                                                                    headcount.embeds[0].setFooter({ text: "Run has ended" });
-                                                                    headcount.embeds[0].setDescription("Run ended by " + user.toString() + ".\nRun time: " + (hours > 0 ? hours + "h" : "") + (minutes > 0 ? minutes + "m" : "") + (seconds.toString().length === 2 ? seconds : "0" + seconds) + "s.");
-                                                                    headcount.edit({ embeds: [headcount.embeds[0]] });
+                                                                    afkcheck.embeds[0].setFooter({ text: "Run has ended" });
+                                                                    afkcheck.embeds[0].setDescription("Run ended by " + user.toString() + ".\nRun time: " + (hours > 0 ? hours + "h" : "") + (minutes > 0 ? minutes + "m" : "") + (seconds.toString().length === 2 ? seconds : "0" + seconds) + "s.");
+                                                                    afkcheck.edit({ embeds: [afkcheck.embeds[0]] });
                                                                     if (countdownMessage) countdownMessage.delete().catch(err => {});
                                                                     ended = true;
                                                                     voiceChannel.setName("Raiding " + (config.raidingChannels.indexOf(voiceChannel.id) + 1));
@@ -248,9 +250,9 @@ module.exports.run = async(client, interaction, connection) => {
                                                             connection.query("UPDATE runs SET ended=true WHERE id=\"" + runId + "\";", function(err) {
                                                                 control.embeds[0].setFooter({ text: "AFK check aborted" });
                                                                 control.edit({ embeds: [control.embeds[0]] });
-                                                                headcount.embeds[0].setFooter({ text: "AFK check aborted" });
-                                                                headcount.embeds[0].setDescription("AFK check has been aborted by " + user.toString() + ".");
-                                                                headcount.edit({ embeds: [headcount.embeds[0]] });
+                                                                afkcheck.embeds[0].setFooter({ text: "AFK check aborted" });
+                                                                afkcheck.embeds[0].setDescription("AFK check has been aborted by " + user.toString() + ".");
+                                                                afkcheck.edit({ embeds: [afkcheck.embeds[0]] });
                                                                 if (countdownMessage) countdownMessage.delete().catch(err => {});
                                                                 voiceChannel.setName("Raiding " + (config.raidingChannels.indexOf(voiceChannel.id) + 1));
                                                                 ended = true;
@@ -346,19 +348,19 @@ module.exports.run = async(client, interaction, connection) => {
                                                                                             }
                                                                                         } else {
                                                                                             var newDesc = [];
-                                                                                            for (i in headcount.embeds[0].description.split("\n")) {
-                                                                                                if (headcount.embeds[0].description.split("\n")[i].includes(preReacts[0])) newDesc.push("Thank you to " + client.guilds.cache.get(config.guildId).members.cache.get(user.id).toString() + " for popping " + (preReacts[0].includes("inc") ? "an " : "a ") + preReacts[0] + " for us!");
-                                                                                                else newDesc.push(headcount.embeds[0].description.split("\n")[i]);
+                                                                                            for (i in afkcheck.embeds[0].description.split("\n")) {
+                                                                                                if (afkcheck.embeds[0].description.split("\n")[i].includes(preReacts[0])) newDesc.push("Thank you to " + client.guilds.cache.get(config.guildId).members.cache.get(user.id).toString() + " for popping " + (preReacts[0].includes("inc") ? "an " : "a ") + preReacts[0] + " for us!");
+                                                                                                else newDesc.push(afkcheck.embeds[0].description.split("\n")[i]);
                                                                                             }
 
-                                                                                            var newHeadcount = new Discord.MessageEmbed()
-                                                                                                .setTitle(headcount.embeds[0].title)
-                                                                                                .setThumbnail(headcount.embeds[0].thumbnail.url)
+                                                                                            var newafkcheck = new Discord.MessageEmbed()
+                                                                                                .setTitle(afkcheck.embeds[0].title)
+                                                                                                .setThumbnail(afkcheck.embeds[0].thumbnail.url)
                                                                                                 .setDescription(newDesc.join("\n"))
-                                                                                                .setColor(headcount.embeds[0].color)
-                                                                                                .setFooter(headcount.embeds[0].footer)
-                                                                                                .setTimestamp(headcount.embeds[0].timestamp);
-                                                                                            headcount.edit({ content: "@ here", embeds: [newHeadcount] });
+                                                                                                .setColor(afkcheck.embeds[0].color)
+                                                                                                .setFooter(afkcheck.embeds[0].footer)
+                                                                                                .setTimestamp(afkcheck.embeds[0].timestamp);
+                                                                                            afkcheck.edit({ content: "@ here", embeds: [newafkcheck] });
                                                                                         }
 
                                                                                         keys.push({ userId: user.id, ign: users[0] != undefined ? users[0].ign : user.username });
@@ -440,19 +442,19 @@ module.exports.run = async(client, interaction, connection) => {
                                                                                             }
                                                                                         } else {
                                                                                             var newDesc = [];
-                                                                                            for (i in headcount.embeds[0].description.split("\n")) {
-                                                                                                if (headcount.embeds[0].description.split("\n")[i].includes(utils.emotes.vial)) newDesc.push("Thank you to " + client.guilds.cache.get(config.guildId).members.cache.get(user.id).toString() + " for popping a " + utils.emotes.vial + " for us!");
-                                                                                                else newDesc.push(headcount.embeds[0].description.split("\n")[i]);
+                                                                                            for (i in afkcheck.embeds[0].description.split("\n")) {
+                                                                                                if (afkcheck.embeds[0].description.split("\n")[i].includes(utils.emotes.vial)) newDesc.push("Thank you to " + client.guilds.cache.get(config.guildId).members.cache.get(user.id).toString() + " for popping a " + utils.emotes.vial + " for us!");
+                                                                                                else newDesc.push(afkcheck.embeds[0].description.split("\n")[i]);
                                                                                             }
 
-                                                                                            var newHeadcount = new Discord.MessageEmbed()
-                                                                                                .setTitle(headcount.embeds[0].title)
-                                                                                                .setThumbnail(headcount.embeds[0].thumbnail.url)
+                                                                                            var newafkcheck = new Discord.MessageEmbed()
+                                                                                                .setTitle(afkcheck.embeds[0].title)
+                                                                                                .setThumbnail(afkcheck.embeds[0].thumbnail.url)
                                                                                                 .setDescription(newDesc.join("\n"))
-                                                                                                .setColor(headcount.embeds[0].color)
-                                                                                                .setFooter(headcount.embeds[0].footer)
-                                                                                                .setTimestamp(headcount.embeds[0].timestamp);
-                                                                                            headcount.edit({ content: "@ here", embeds: [newHeadcount] });
+                                                                                                .setColor(afkcheck.embeds[0].color)
+                                                                                                .setFooter(afkcheck.embeds[0].footer)
+                                                                                                .setTimestamp(afkcheck.embeds[0].timestamp);
+                                                                                            afkcheck.edit({ content: "@ here", embeds: [newafkcheck] });
                                                                                         }
 
                                                                                         vials.push({ userId: user.id, ign: users[0] != undefined ? users[0].ign : user.username });
@@ -530,10 +532,10 @@ module.exports.run = async(client, interaction, connection) => {
                                                                 voiceChannel.permissionOverwrites.create(interaction.guild.roles.cache.find(r => r.id === config.verifiedRoleId), { "CONNECT": false, "VIEW_CHANNEL": false });
                                                                 connection.query("UPDATE runs SET ended=true WHERE id=\"" + runId + "\";", function(err) {
                                                                     control.edit({ embeds: [controlEmbed.setFooter({ text: "AFK check aborted" })] });
-                                                                    headcount.edit({ embeds: [embed.setFooter({ text: "AFK check aborted" })] });
-                                                                    headcount.embeds[0].setFooter({ text: "AFK check aborted" });
-                                                                    headcount.embeds[0].setDescription("Timed out, AFK check has been aborted.");
-                                                                    headcount.edit({ embeds: [headcount.embeds[0]] });
+                                                                    afkcheck.edit({ embeds: [embed.setFooter({ text: "AFK check aborted" })] });
+                                                                    afkcheck.embeds[0].setFooter({ text: "AFK check aborted" });
+                                                                    afkcheck.embeds[0].setDescription("Timed out, AFK check has been aborted.");
+                                                                    afkcheck.edit({ embeds: [afkcheck.embeds[0]] });
                                                                     if (countdownMessage) countdownMessage.delete().catch(err => {});
                                                                     voiceChannel.setName("Raiding " + (config.raidingChannels.indexOf(voiceChannel.id) + 1));
                                                                     ended = true;
@@ -554,14 +556,14 @@ module.exports.run = async(client, interaction, connection) => {
                                                             }
                                                             var minutes = Math.floor(lastTime / 60);
                                                             var seconds = lastTime - minutes * 60;
-                                                            var newHeadcount = new Discord.MessageEmbed()
-                                                                .setTitle(headcount.embeds[0].title)
-                                                                .setThumbnail(headcount.embeds[0].thumbnail.url)
-                                                                .setDescription(headcount.embeds[0].description)
-                                                                .setColor(headcount.embeds[0].color)
+                                                            var newAfkcheck = new Discord.MessageEmbed()
+                                                                .setTitle(afkcheck.embeds[0].title)
+                                                                .setThumbnail(afkcheck.embeds[0].thumbnail.url)
+                                                                .setDescription(afkcheck.embeds[0].description)
+                                                                .setColor(afkcheck.embeds[0].color)
                                                                 .setFooter({ text: "AFK check will end in " + (minutes > 0 ? minutes + "m" : "") + (seconds > 0 ? seconds + "s" : "") })
-                                                                .setTimestamp(headcount.embeds[0].timestamp);
-                                                            headcount.edit({ embeds: [newHeadcount] });
+                                                                .setTimestamp(afkcheck.embeds[0].timestamp);
+                                                            afkcheck.edit({ embeds: [newAfkcheck] });
                                                         }, 30000);
                                                     });
                                                 });

@@ -76,7 +76,7 @@ module.exports.info = {
         name: "command",
         description: "The optional command you want info on",
         type: 3,
-        choices: [{ name: "Addrole", value: "addrole" }, { name: "Afkcheck", value: "afkcheck" }, { name: "Ban", value: "ban" }, { name: "Clear", value: "clear" }, { name: "Find", value: "find" }, { name: "Headcount", value: "headcount" }, { name: "Help", value: "help" }, { name: "Join", value: "join" }, { name: "Kick", value: "kick" }, { name: "Ping", value: "ping" }, { name: "Removerole", value: "removerole" }, { name: "Unban", value: "unban" }, { name: "Verify", value: "verify" }]
+        choices: [{ name: "Addrole", value: "addrole" }, { name: "Afkcheck", value: "afkcheck" }, { name: "Ban", value: "ban" }, { name: "Clear", value: "clear" }, { name: "Find", value: "find" }, { name: "Headcount", value: "headcount" }, { name: "Help", value: "help" }, { name: "Join", value: "join" }, { name: "Kick", value: "kick" }, { name: "Ping", value: "ping" }, { name: "Removerole", value: "removerole" }, { name: "Unban", value: "unban" }, { name: "Verify", value: "verify" }, { name: "Parse", value: "parse" }]
     }],
     usage: "help [command]",
     restricted: false

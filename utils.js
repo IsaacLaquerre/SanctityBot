@@ -1,4 +1,5 @@
 const Discord = require("discord.js");
+const request = require("request");
 const config = require("./botConfig.json");
 
 module.exports = {
@@ -22,15 +23,6 @@ module.exports = {
         });
     },
 
-    generateId(length) {
-        var chars = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ1234567890";
-        var result = "";
-
-        for (var i = 0; i < length; i++) result += chars[Math.floor(Math.random() * chars.length)];
-
-        return result;
-    },
-
     addReaction(reaction, message) {
         return new Promise((resolve, reject) => {
             message.react(reaction).then(() => resolve());
@@ -39,60 +31,107 @@ module.exports = {
 
     disconnectMembers(vc) {
         vc.members.forEach(member => member.voice.disconnect());
+    },
+
+    numberWithSpaces(x) {
+        return x.toString().replace(/\B(?=(\d{3})+(?!\d))/g, " ");
+    },
+
+    requestItems() {
+        return new Promise(function(resolve, reject) {
+            request("https://www.realmeye.com/s/dw/js/definition.js", {
+                method: "GET",
+                headers: {
+                    "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/68.0.3440.106 Safari/537.36"
+                }
+            }, (err, res, body) => {
+                if (!err && res.statusCode === 200) {
+                    var item = body.replace("items=", "").replace(/;/g, "").replace(/e3/g, "0000");
+                    item = item.replace(/-?\d+:/g, function(n) {
+                        if (item[item.indexOf(n) - 1] === "\"") return n.replace(/:/g, "");
+                        return "\"" + n.replace(/:/g, "") + "\":";
+                    });
+                    resolve(JSON.parse(item));
+                } else reject(err);
+            });
+        });
     }
 };
 
 module.exports.messages = {
     missingPermissions(interaction) {
         var embed = new Discord.MessageEmbed()
+            .setColor("#FF0000")
             .setDescription("You do not have the required permissions to use that command.");
         interaction.reply({ embeds: [embed], ephemeral: true });
     },
 
     unknownCommand(interaction, command) {
         var embed = new Discord.MessageEmbed()
+            .setColor("#FF0000")
             .setDescription("Unknown command \"" + command + "\".");
         interaction.reply({ embeds: [embed], ephemeral: true });
     },
 
     unknownUser(interaction, user) {
         var embed = new Discord.MessageEmbed()
+            .setColor("#FF0000")
             .setDescription("Couldn't find user \"" + user + "\".");
         interaction.reply({ embeds: [embed], ephemeral: true });
     },
 
     unknownRole(interaction, role) {
         var embed = new Discord.MessageEmbed()
+            .setColor("#FF0000")
             .setDescription("Couldn't find role \"" + role + "\".");
+        interaction.reply({ embeds: [embed], ephemeral: true });
+    },
+
+    unknownRunRl(interaction) {
+        var embed = new Discord.MessageEmbed()
+            .setColor("#FF0000")
+            .setDescription("Couldn't find an active run that you are leading.");
+        interaction.reply({ embeds: [embed], ephemeral: true });
+    },
+
+    unknownRun(interaction) {
+        var embed = new Discord.MessageEmbed()
+            .setColor("#FF0000")
+            .setDescription("Couldn't find an active run with that ID.");
         interaction.reply({ embeds: [embed], ephemeral: true });
     },
 
     noArgs(interaction, arg) {
         var embed = new Discord.MessageEmbed()
+            .setColor("#FF0000")
             .setDescription("Command is missing a parameter: `" + arg + "`.");
         interaction.reply({ embeds: [embed], ephemeral: true });
     },
 
     badArgument(interaction, arg, value) {
         var embed = new Discord.MessageEmbed()
+            .setColor("#FF0000")
             .setDescription("Incorrect argument. Cannot use \"" + value + "\" for parameter `" + arg + "`.");
         interaction.reply({ embeds: [embed], ephemeral: true });
     },
 
     alreadyHasRole(interaction, user, role) {
         var embed = new Discord.MessageEmbed()
+            .setColor("#FF0000")
             .setDescription("User \"" + user + "\" already has the role \"" + role.toString() + "\".");
         interaction.reply({ embeds: [embed], ephemeral: true });
     },
 
     doesntHaveRole(interaction, user, role) {
         var embed = new Discord.MessageEmbed()
+            .setColor("#FF0000")
             .setDescription("User \"" + user + "\" doesn't have the role \"" + role.toString() + "\".");
         interaction.reply({ embeds: [embed], ephemeral: true });
     },
 
     noVoiceChannel(interaction) {
         var embed = new Discord.MessageEmbed()
+            .setColor("#FF0000")
             .setDescription("Please join a voice channel first.");
         interaction.reply({ embeds: [embed], ephemeral: true });
     }
@@ -140,7 +179,15 @@ module.exports.emotes = {
     openVc: "🔓",
     endAfk: "🔚",
     abortAfk: "❌",
-    endRun: "☑️"
+    endRun: "☑️",
+    stars: {
+        "light-blue": "<:lightbluestar:974015769459445860>",
+        "blue": "<:bluestar:974015782860234863>",
+        "red": "<:redstar:974015798773415987>",
+        "orange": "<:orangestar:974015804964233272>",
+        "yellow": "<:yellowstar:974015812836950087>",
+        "white": "<:whitestar:974015821854687252>"
+    }
 };
 
 Object.defineProperty(String.prototype, 'capitalize', {

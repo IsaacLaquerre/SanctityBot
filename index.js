@@ -183,7 +183,7 @@ client.on("messageCreate", (message) => {
     }
 });
 
-var dbCommands = ["verify", "find", "f", "join", "j", "afkcheck", "afk", "ac"];
+var dbCommands = ["verify", "find", "f", "join", "j", "afkcheck", "afk", "ac", "parse", "p"];
 
 client.on("interactionCreate", async interaction => {
     if (!interaction.isCommand()) return;
