@@ -64,8 +64,8 @@ for (const file of commandFiles) {
             }
             applicationCommands.push(applicationCommand);
         }
-        console.log("Loaded " + command.info.name + " command");
     }
+    console.log("Loaded " + command.info.name + " command");
 }
 
 const rest = new REST({ version: '9' }).setToken(TOKEN);
@@ -183,7 +183,7 @@ client.on("messageCreate", (message) => {
     }
 });
 
-var dbCommands = ["verify", "find", "f", "join", "j", "afkcheck", "afk", "ac", "parse", "p"];
+var dbCommands = ["verify", "find", "f", "join", "j", "afkcheck", "afk", "ac", "parse", "p", "updateloc", "updatelocation", "changeloc", "changelocation"];
 
 client.on("interactionCreate", async interaction => {
     if (!interaction.isCommand()) return;

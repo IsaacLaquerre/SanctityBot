@@ -134,6 +134,13 @@ module.exports.messages = {
             .setColor("#FF0000")
             .setDescription("Please join a voice channel first.");
         interaction.reply({ embeds: [embed], ephemeral: true });
+    },
+
+    error(interaction, message) {
+        var embed = new Discord.MessageEmbed()
+            .setColor("#FF0000")
+            .setDescription(message);
+        interaction.reply({ embeds: [embed], ephemeral: true });
     }
 };
 

@@ -72,72 +72,9 @@ module.exports.run = (client, interaction, connection) => {
                                     }
                                 }
 
-                                var description = [];
-                                var bio = $("div.container div.description");
-                                bio.children().each((i, child) => {
-                                    if (child.children[0] != undefined) description.push(child.children[0].data.replace("If this is your character, then you can add some description here, when you are logged in to RealmEye.", username + " has no description yet."));
-                                });
-
-                                var characters = [];
-                                if ($("div.table-responsive").length > 0) {
-                                    $("div.table-responsive tbody tr").each((i, element) => {
-                                        var character = {};
-                                        character.equipment = [];
-                                        var fields = [];
-                                        element.children.forEach(child => {
-                                            child.children.forEach(child => {
-                                                if (child.name === "span") {
-                                                    if (child.attribs && child.attribs.class) {
-                                                        if (child.attribs.class === "pet") {
-                                                            character.pet = {
-                                                                petName: itemList[child.attribs["data-item"]][0],
-                                                                petId: child.attribs["data-item"],
-                                                            };
-                                                        } else if (child.attribs.class === "item-wrapper") {
-                                                            child.children.forEach(child => {
-                                                                var item = {};
-                                                                child.children.forEach(child => {
-                                                                    item.name = child.attribs.title.split(" ").slice(0, child.attribs.title.split(" ").length - 1).join(" ");
-                                                                    item.tier = child.attribs.title.split(" ")[child.attribs.title.split(" ").length - 1];
-                                                                });
-                                                                item.wikiUrl = "https://www.realmeye.com" + child.attribs.href;
-                                                                character.equipment.push(item);
-                                                            });
-                                                        } else if (child.attribs.class === "player-stats") {
-                                                            character.stats = child.children[0].data;
-                                                        }
-                                                    }
-                                                } else if (child.name === "a") {
-                                                    if (child.attribs && child.attribs.class && child.attribs.class === "character") {
-                                                        character.classId = child.attribs["data-class"];
-                                                        character.skin = child.attribs["data-skin"];
-                                                        character.clothingDye = child.attribs["data-dye1"];
-                                                        character.accessoryDye = child.attribs["data-dye2"];
-                                                        character.clothingDyeId = child.attribs["data-clothing-dye-id"];
-                                                        character.accessoryDyeId = child.attribs["data-accessory-dye-id"];
-                                                    }
-                                                } else if (child.name == undefined && child.data.length != 0) {
-                                                    fields.push(child.data);
-                                                }
-                                            });
-                                        });
-                                        if (fields.length != 0) {
-                                            character.className = fields[0];
-                                            character.level = fields[1];
-                                            character.classQuestsCompleted = fields[2];
-                                            character.fame = fields[3];
-                                            character.experience = fields[4];
-                                            character.rank = fields[5];
-                                        }
-                                        characters.push(character);
-                                    });
-                                }
-
                                 var data = {
                                     username: username,
-                                    summary: summary,
-                                    description: description,
-                                    characters: characters
+                                    summary: summary
                                 };
 
                                 var embed = new Discord.MessageEmbed()
